@@ -1,2 +1,2 @@
-PredictionIO javaScript API SDK
+PredictionIO JavaScript API SDK
 ===============================

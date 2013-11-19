@@ -13,4 +13,26 @@ describe('PredictionIOClient', function () {
         sut.should.to.throw(/api key is required/);
     });
 
+    it("should make client with api url", function () {
+        var url = 'example url',
+            sut = new PredictionIOClient({
+                'apikey': 'key',
+                'apiurl': url
+            });
+        sut.apiurl.should.equal(url);
+    });
+
+    it("should make client with default api url", function () {
+        var sut = new PredictionIOClient({
+                'apikey': 'key'
+            });
+        sut.apiurl.should.equal('http://localhost:8000');
+    });
+
+    describe('User', function () {
+        it('should create user by user_id', function () {
+            sut.createUser('uid');
+        });
+    });
+
 });
