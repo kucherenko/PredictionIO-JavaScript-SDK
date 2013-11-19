@@ -19,12 +19,14 @@
         "bower.js"
     ],
     "dependencies": {
-        "rest": "~1.0.x"
+        "rest": "~1.0.x",
+        "when": "~2.6.x"
     },
     "devDependencies": {
         "mocha": "~1.14.x",
         "chai": "~1.8.x",
-        "sinon": "~1.7.x"
+        "sinon": "~1.7.x",
+        "sinon-chai": "~2.4.x"
     },
     "author": "Andrey Kucherenko",
     "license": "BSD-2-Clause",
