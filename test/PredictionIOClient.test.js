@@ -62,7 +62,7 @@ describe('PredictionIOClient', function () {
                 allowed = [
                     'pio_zz'
                 ];
-            sut.checkPIOParams(parameters, allowed).should.equal(true);
+            sut.checkParams(parameters, allowed).should.equal(true);
         });
 
         it('should throw exception if parameter not allowed', function () {
@@ -73,7 +73,7 @@ describe('PredictionIOClient', function () {
                     'pio_zz'
                 ];
             (function () {
-                sut.checkPIOParams(parameters, allowed);
+                sut.checkParams(parameters, allowed);
             }).should.throw(/pio_zzz paramter is not allowed for this request/);
         });
 
@@ -82,7 +82,7 @@ describe('PredictionIOClient', function () {
                 parameters = {
                     test: 'zz'
                 };
-            sut.checkPIOParams(parameters, [], allowNonPio);
+            sut.checkParams(parameters, [], allowNonPio);
         });
 
         it('should throw exception for non pio fields in parameters', function () {
@@ -91,7 +91,7 @@ describe('PredictionIOClient', function () {
                     test: 'zz'
                 };
             (function () {
-                sut.checkPIOParams(parameters, [], allowNonPio);
+                sut.checkParams(parameters, [], allowNonPio);
             }).should.throw(/test paramter is not allowed for this request/);
         });
 
@@ -104,6 +104,20 @@ describe('PredictionIOClient', function () {
             apikey = "apikey"
             sut = new PredictionIOClient({ 'apikey': apikey })
         });
+
+
+        it('should get user from server', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.getUser('uid');
+            makeRequest.should.have.been.calledWith('/users/uid.json', 'GET');
+        });
+
+        it('should delete user', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.deleteUser('uid');
+            makeRequest.should.have.been.calledWith('/users/uid.json', 'DELETE');
+        });
+
         describe('(Add User)', function () {
 
             it("should add user by uid", function () {
@@ -147,7 +161,12 @@ describe('PredictionIOClient', function () {
                 );
             });
 
-
+            it('should check parameters for allowed', function () {
+                var params = {},
+                    checkParameters = env.stub(sut, 'checkParams');
+                sut.addUser('aaa', params);
+                checkParameters.should.have.been.calledWith(params, ['pio_latlng', 'pio_inactive'], true);
+            });
         });
     });
 

@@ -31,18 +31,25 @@
                 pio_appkey: this.apikey,
                 pio_uid: uid
             };
-
+            this.checkParams(params, ['pio_latlng', 'pio_inactive'], true);
             if (params.pio_latlng) {
-                entity.pio_latlng = params.pio_latlng.join(',');
+                params.pio_latlng = params.pio_latlng.join(',');
             }
-
-            if (params.hasOwnProperty('pio_inactive')) {
-                entity.pio_inactive = params.pio_inactive;
-            }
-            this.makeRequest('/users.json', 'POST', entity);
+            Object.keys(params).forEach(function (el) {
+                entity[el] = params[el];
+            });
+            return this.makeRequest('/users.json', 'POST', entity);
         };
 
-        PredictionIOClient.prototype.checkPIOParams = function (parameters, allowed, allowNonPio) {
+        PredictionIOClient.prototype.getUser = function (uid) {
+            return this.makeRequest('/users/' + uid + '.json', 'GET');
+        };
+
+        PredictionIOClient.prototype.deleteUser = function (uid) {
+            return this.makeRequest('/users/' + uid + '.json', 'DELETE');
+        };
+
+        PredictionIOClient.prototype.checkParams = function (parameters, allowed, allowNonPio) {
             parameters = parameters || {};
             allowed = allowed || [];
             Object.keys(parameters).forEach(function (el) {
