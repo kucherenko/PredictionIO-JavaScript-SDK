@@ -74,7 +74,25 @@ describe('PredictionIOClient', function () {
                 ];
             (function () {
                 sut.checkPIOParams(parameters, allowed);
-            }).should.throw(/pio_zzz paramter is not allowed/);
+            }).should.throw(/pio_zzz paramter is not allowed for this request/);
+        });
+
+        it('should check parameters for non pio fields in parameters', function () {
+            var allowNonPio = true,
+                parameters = {
+                    test: 'zz'
+                };
+            sut.checkPIOParams(parameters, [], allowNonPio);
+        });
+
+        it('should throw exception for non pio fields in parameters', function () {
+            var allowNonPio = false,
+                parameters = {
+                    test: 'zz'
+                };
+            (function () {
+                sut.checkPIOParams(parameters, [], allowNonPio);
+            }).should.throw(/test paramter is not allowed for this request/);
         });
 
     });

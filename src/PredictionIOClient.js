@@ -42,12 +42,14 @@
             this.makeRequest('/users.json', 'POST', entity);
         };
 
-        PredictionIOClient.prototype.checkPIOParams = function (parameters, allowed) {
+        PredictionIOClient.prototype.checkPIOParams = function (parameters, allowed, allowNonPio) {
             parameters = parameters || {};
             allowed = allowed || [];
             Object.keys(parameters).forEach(function (el) {
                 if (allowed.indexOf(el) === -1) {
-                    throw new Error(el + ' paramter is not allowed');
+                    if (el.indexOf('pio_') === 0 || !allowNonPio) {
+                        throw new Error(el + ' paramter is not allowed for this request');
+                    }
                 }
             });
             return true;
