@@ -3,6 +3,12 @@
 
     define(function (require) {
 
+        function extendObject(object, extend) {
+            Object.keys(extend).forEach(function (el) {
+                object[el] = extend[el];
+            });
+        }
+
         var rest = require('rest'),
             mime = require('rest/interceptor/mime'),
 
@@ -25,6 +31,58 @@
             });
         };
 
+        PredictionIOClient.prototype.doAction = function (uid, iid, action, params) {
+            var actions = ["rate", "like", "dislike", "view", "conversion"],
+                entity;
+            params = params || {};
+
+            entity = {
+                pio_appkey: this.apikey,
+                pio_uid: uid,
+                pio_iid: iid,
+                pio_action: action
+            };
+
+            if (actions.indexOf(action) === -1) {
+                throw new Error(action +
+                    ' action is not supported, you can use only "rate", "like",' +
+                    ' "dislike", "view" or "conversion" actions');
+            }
+
+            this.checkParams(params, [
+                'pio_latlng',
+                'pio_t'
+            ], true);
+
+            if (params.pio_latlng) {
+                params.pio_latlng = params.pio_latlng.join(',');
+            }
+            extendObject(entity, params);
+            this.makeRequest('/actions/u2i.json', 'POST', entity);
+        };
+
+        PredictionIOClient.prototype.addItem = function (iid, types, params) {
+            params = params || {};
+            var entity = {
+                pio_appkey: this.apikey,
+                pio_iid: iid,
+                pio_itypes: types.join(',')
+            };
+            this.checkParams(params, [
+                'pio_latlng',
+                'pio_inactive',
+                'pio_startT',
+                'pio_endT',
+                'pio_price',
+                'pio_profit'
+            ], true);
+            if (params.pio_latlng) {
+                params.pio_latlng = params.pio_latlng.join(',');
+            }
+            extendObject(entity, params);
+            this.makeRequest('/items.json', 'POST', entity);
+        };
+
         PredictionIOClient.prototype.addUser = function (uid, params) {
             params = params || {};
             var entity = {
@@ -35,14 +93,20 @@
             if (params.pio_latlng) {
                 params.pio_latlng = params.pio_latlng.join(',');
             }
-            Object.keys(params).forEach(function (el) {
-                entity[el] = params[el];
-            });
+            extendObject(entity, params);
             return this.makeRequest('/users.json', 'POST', entity);
         };
 
         PredictionIOClient.prototype.getUser = function (uid) {
             return this.makeRequest('/users/' + uid + '.json', 'GET');
+        };
+
+        PredictionIOClient.prototype.getItem = function (iid) {
+            return this.makeRequest('/items/' + iid + '.json', 'GET');
+        };
+
+        PredictionIOClient.prototype.deleteItem = function (iid) {
+            return this.makeRequest('/items/' + iid + '.json', 'DELETE');
         };
 
         PredictionIOClient.prototype.deleteUser = function (uid) {

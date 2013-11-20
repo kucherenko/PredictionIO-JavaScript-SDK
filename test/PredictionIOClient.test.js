@@ -39,7 +39,7 @@ describe('PredictionIOClient', function () {
         it('should make promise for request to server', function () {
             var promise = env.stub().returns('promise');
             env.stub(rest, 'chain').returns(promise);
-            sut.makeRequest().should.equal('promise')
+            sut.makeRequest().should.equal('promise');
         });
 
         it('should make request to server with passed params', function () {
@@ -97,12 +97,151 @@ describe('PredictionIOClient', function () {
 
     });
 
+    describe('User-to-Item API', function () {
+
+        var sut, apikey;
+        beforeEach(function () {
+            apikey = "apikey";
+            sut = new PredictionIOClient({ 'apikey': apikey });
+        });
+
+        it('should make action from user with item', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.doAction('uid', 'iid', 'like');
+            makeRequest.should.have.been.calledWith(
+                '/actions/u2i.json',
+                'POST',
+                {
+                    pio_appkey: apikey,
+                    pio_uid: 'uid',
+                    pio_iid: 'iid',
+                    pio_action: 'like'
+                }
+            );
+        });
+
+        it('should make action from user with item with geoinfo', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.doAction('uid', 'iid', 'like', {pio_latlng: [12.34, 5.67]});
+            makeRequest.should.have.been.calledWith(
+                '/actions/u2i.json',
+                'POST',
+                {
+                    pio_appkey: apikey,
+                    pio_uid: 'uid',
+                    pio_iid: 'iid',
+                    pio_action: 'like',
+                    pio_latlng: '12.34,5.67'
+                }
+            );
+        });
+
+        it('should throw exception if action is not "rate", "like", "dislike", "view" or "conversion"', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            (function () {
+                sut.doAction('uid', 'iid', 'unlike');
+            }).should
+                .throw(
+                    /unlike action is not supported, you can use only "rate", "like", "dislike", "view" or "conversion" actions/
+                );
+        });
+
+        it('should check parameters for allowed', function () {
+            var params = {},
+                checkParameters = env.stub(sut, 'checkParams');
+            sut.doAction('uid', 'iid', 'like', params);
+            checkParameters.should.have.been.calledWith(params, [
+                'pio_latlng',
+                'pio_t'
+            ], true);
+        });
+    });
+
+    describe('Item recommendation API', function () {
+        var sut, apikey;
+        beforeEach(function () {
+            apikey = "apikey";
+            sut = new PredictionIOClient({ 'apikey': apikey });
+        });
+
+        it('should get recommended items', function () {
+            
+        });
+    });
+
+    describe('Item API', function () {
+        var sut, apikey;
+        beforeEach(function () {
+            apikey = "apikey";
+            sut = new PredictionIOClient({ 'apikey': apikey });
+        });
+
+        it('should get item from server', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.getItem('iid');
+            makeRequest.should.have.been.calledWith('/items/iid.json', 'GET');
+        });
+
+        it('should delete item', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.deleteItem('iid');
+            makeRequest.should.have.been.calledWith('/items/iid.json', 'DELETE');
+        });
+
+
+        describe('(Add Item)', function () {
+
+            it("should add item by iid and types", function () {
+                var makeRequest = env.stub(sut, 'makeRequest');
+                sut.addItem('iid', ['type1', 'type2']);
+                makeRequest.should.have.been.calledWith(
+                    '/items.json',
+                    'POST',
+                    {
+                        pio_appkey: apikey,
+                        pio_iid: 'iid',
+                        pio_itypes: 'type1,type2'
+                    }
+                );
+            });
+
+            it('should add user with geo info', function () {
+                var makeRequest = env.stub(sut, 'makeRequest');
+                sut.addItem('iid', ['type'], {pio_latlng: [12.34, 5.67]});
+                makeRequest.should.have.been.calledWith(
+                    '/items.json',
+                    'POST',
+                    {
+                        pio_appkey: apikey,
+                        pio_iid: 'iid',
+                        pio_itypes: 'type',
+                        pio_latlng: '12.34,5.67'
+                    }
+                );
+            });
+
+            it('should check parameters for allowed', function () {
+                var params = {},
+                    checkParameters = env.stub(sut, 'checkParams');
+                sut.addItem('aaa', [], params);
+                checkParameters.should.have.been.calledWith(params, [
+                    'pio_latlng',
+                    'pio_inactive',
+                    'pio_startT',
+                    'pio_endT',
+                    'pio_price',
+                    'pio_profit'
+                ], true);
+            });
+        });
+
+    });
 
     describe('User API', function () {
         var sut, apikey;
         beforeEach(function () {
-            apikey = "apikey"
-            sut = new PredictionIOClient({ 'apikey': apikey })
+            apikey = "apikey";
+            sut = new PredictionIOClient({ 'apikey': apikey });
         });
 
 
