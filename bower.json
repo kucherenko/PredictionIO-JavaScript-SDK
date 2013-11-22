@@ -1,0 +1,23 @@
+{
+    "name": "PredictionIO-JavaScript-SDK",
+    "version": "0.0.1",
+    "homepage": "https://github.com/kucherenko/PredictionIO-JavaScript-SDK",
+    "authors": [
+        "Andrey Kucherenko <kucherenko.andrey@gmail.com>"
+    ],
+    "description": "PredictionIO JavaScript API SDK",
+    "main": "src/PredictionIOClient.js",
+    "keywords": [
+        "PredictionIO",
+        "SDK",
+        "API"
+    ],
+    "dependencies": {
+        "rest": "~1.0.x",
+        "when": "~2.6.x"
+    },
+    "ignore": [
+        "test"
+    ],
+    "license": "MIT"
+}
