@@ -165,8 +165,66 @@ describe('PredictionIOClient', function () {
         });
 
         it('should get recommended items', function () {
-            
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.getRecommended('engine', 'uid', 5);
+            makeRequest.should.have.been.calledWith(
+                '/engines/itemrec/engine/topn.json',
+                'GET',
+                {
+                    pio_appkey: apikey,
+                    pio_uid: 'uid',
+                    pio_n: 5
+                }
+            );
         });
+
+        it('should check parameters for allowed', function () {
+                var params = {},
+                    checkParameters = env.stub(sut, 'checkParams');
+                sut.getRecommended('engine', 'uid', 5);
+                checkParameters.should.have.been.calledWith(params, [
+                    'pio_itypes',
+                    'pio_latlng',
+                    'pio_within',
+                    'pio_unit',
+                    'pio_attributes'
+                ], false);
+            });
+    });
+
+    describe('Item Similar API', function () {
+        var sut, apikey;
+        beforeEach(function () {
+            apikey = "apikey";
+            sut = new PredictionIOClient({ 'apikey': apikey });
+        });
+
+        it('should get recommended items', function () {
+            var makeRequest = env.stub(sut, 'makeRequest');
+            sut.getSimilar('engine', 'uid', 5);
+            makeRequest.should.have.been.calledWith(
+                '/engines/itemsim/engine/topn.json',
+                'GET',
+                {
+                    pio_appkey: apikey,
+                    pio_uid: 'uid',
+                    pio_n: 5
+                }
+            );
+        });
+
+        it('should check parameters for allowed', function () {
+                var params = {},
+                    checkParameters = env.stub(sut, 'checkParams');
+                sut.getSimilar('engine', 'uid', 5);
+                checkParameters.should.have.been.calledWith(params, [
+                    'pio_itypes',
+                    'pio_latlng',
+                    'pio_within',
+                    'pio_unit',
+                    'pio_attributes'
+                ], false);
+            });
     });
 
     describe('Item API', function () {

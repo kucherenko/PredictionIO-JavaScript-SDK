@@ -134,6 +134,6 @@
     "maxparams"     : 30,
     "maxdepth"      : 5,
     "indent"        : 4,         // Specify indentation spacing
-    "maxlen"        : 120
+    "maxlen"        : 150
 
 }

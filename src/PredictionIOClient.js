@@ -23,12 +23,17 @@
             };
 
         PredictionIOClient.prototype.makeRequest = function (path, method, entity) {
-            var client = rest.chain(mime);
-            return client({
-                path: path,
-                method: method,
-                entity: entity
-            });
+            var client = rest.chain(mime),
+                parameters = {
+                    path: path,
+                    method: method
+                };
+            if (method === 'GET' || method === 'DELETE') {
+                parameters.params = entity;
+            } else {
+                parameters.entity = entity;
+            }
+            return client(parameters);
         };
 
         PredictionIOClient.prototype.doAction = function (uid, iid, action, params) {
@@ -95,6 +100,52 @@
             }
             extendObject(entity, params);
             return this.makeRequest('/users.json', 'POST', entity);
+        };
+
+        PredictionIOClient.prototype.getRecommended = function (engine, uid, count, params) {
+            params = params || {};
+            var entity = {
+                pio_appkey: this.apikey,
+                pio_uid: uid,
+                pio_n: count
+            };
+
+            this.checkParams(params, [
+                'pio_itypes',
+                'pio_latlng',
+                'pio_within',
+                'pio_unit',
+                'pio_attributes'
+            ], false);
+
+            if (params.pio_latlng) {
+                params.pio_latlng = params.pio_latlng.join(',');
+            }
+            extendObject(entity, params);
+            return this.makeRequest('/engines/itemrec/' + engine + '/topn.json', 'GET', entity);
+        };
+
+        PredictionIOClient.prototype.getSimilar = function (engine, uid, count, params) {
+            params = params || {};
+            var entity = {
+                pio_appkey: this.apikey,
+                pio_uid: uid,
+                pio_n: count
+            };
+
+            this.checkParams(params, [
+                'pio_itypes',
+                'pio_latlng',
+                'pio_within',
+                'pio_unit',
+                'pio_attributes'
+            ], false);
+
+            if (params.pio_latlng) {
+                params.pio_latlng = params.pio_latlng.join(',');
+            }
+            extendObject(entity, params);
+            return this.makeRequest('/engines/itemsim/' + engine + '/topn.json', 'GET', entity);
         };
 
         PredictionIOClient.prototype.getUser = function (uid) {
